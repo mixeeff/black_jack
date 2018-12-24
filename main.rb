@@ -1,31 +1,29 @@
 require_relative('card')
 require_relative('deck')
-require_relative('user')
-require_relative('dealer')
+require_relative('hand')
 require_relative('game')
+require_relative('interface')
 
 class Main
   START_MONEY = 100
   START_CARD_COUNT = 2
   BET = 10
+  DEALER_NAME = 'Dealer'.freeze
+
+  def initialize
+    @interface = Interface.new
+  end
 
   def run
-    puts ' === Black Jack Game. Written by D.Mikheev. 2018 === '
-    print 'Enter your name: '
-    name = gets.chomp.capitalize
-    puts ''
-    user = User.new(name, START_MONEY)
-    dealer = Dealer.new(START_MONEY)
+    @interface.startup
+    name = @interface.user_name
+    user = Hand.new(name, START_MONEY)
+    dealer = Hand.new(DEALER_NAME, START_MONEY)
 
     loop do
-      game = Game.new(user, dealer, BET)
-      break unless game.run
-
-      print 'Play again? '
-      choice = gets.chomp.upcase
-      break unless choice == 'Y'
-
-      puts ''
+      game = Game.new(user, dealer, BET, @interface)
+      game.run
+      break unless @interface.repeat_game?
     end
   end
 end
